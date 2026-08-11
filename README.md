@@ -13,9 +13,22 @@ Requires Go 1.23+.
 
 ## Install
 
+Installed straight from GitHub; Go has no separate package registry to publish to.
+
 ```sh
-go get github.com/otp-com/sdk-go
+go get github.com/otp-com/sdk-go@latest
 ```
+
+There is no version tag yet, so `@latest` resolves to a pseudo-version of the `main` branch
+(`v0.0.0-<date>-<commit>`). That is what lands in your `go.mod`, and `go.sum` pins the exact commit,
+so builds stay reproducible. To pick a specific commit or branch yourself:
+
+```sh
+go get github.com/otp-com/sdk-go@<commit-sha>
+go get github.com/otp-com/sdk-go@main
+```
+
+Once the repository is tagged, switch to `go get github.com/otp-com/sdk-go@v1.0.0`.
 
 ## Quickstart
 
