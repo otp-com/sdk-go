@@ -4,8 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Recipient** | **string** | Phone number in E.164 (e.g. +14155552671) or an email address. | 
-**Locale** | Pointer to **string** | Message language, e.g. \&quot;en\&quot; or \&quot;tr\&quot;. | [optional] 
+**Recipient** | **string** | Phone number (E.164) or email address to deliver the OTP to. | 
+**Locale** | Pointer to **NullableString** | BCP-47 locale for the message template; falls back to the app default. | [optional] 
 
 ## Methods
 
@@ -71,6 +71,16 @@ SetLocale sets Locale field to given value.
 
 HasLocale returns a boolean if a field has been set.
 
+### SetLocaleNil
+
+`func (o *SendRequest) SetLocaleNil(b bool)`
+
+ SetLocaleNil sets the value for Locale to be an explicit nil
+
+### UnsetLocale
+`func (o *SendRequest) UnsetLocale()`
+
+UnsetLocale ensures that no value is present for Locale, not even an explicit nil
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API. 
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
 
 API version: 1.0.0
 */
@@ -93,7 +93,7 @@ func NewConfiguration() *Configuration {
 		Debug:            false,
 		Servers:          ServerConfigurations{
 			{
-				URL: "https://api.otp.com/api/v1",
+				URL: "https://api.otp.com",
 				Description: "Production",
 			},
 		},

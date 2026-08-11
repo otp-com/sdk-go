@@ -4,8 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**OtpId** | **string** |  | 
-**Channel** | Pointer to **NullableString** | Move this OTP onto a specific channel, e.g. \&quot;sms\&quot; when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order.  | [optional] 
+**OtpId** | **string** | The OTP id to resend. | 
+**Channel** | Pointer to [**NullableChannel**](Channel.md) | Move this OTP onto a specific channel, e.g. \&quot;sms\&quot; when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order. | [optional] 
 
 ## Methods
 
@@ -48,20 +48,20 @@ SetOtpId sets OtpId field to given value.
 
 ### GetChannel
 
-`func (o *ResendRequest) GetChannel() string`
+`func (o *ResendRequest) GetChannel() Channel`
 
 GetChannel returns the Channel field if non-nil, zero value otherwise.
 
 ### GetChannelOk
 
-`func (o *ResendRequest) GetChannelOk() (*string, bool)`
+`func (o *ResendRequest) GetChannelOk() (*Channel, bool)`
 
 GetChannelOk returns a tuple with the Channel field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetChannel
 
-`func (o *ResendRequest) SetChannel(v string)`
+`func (o *ResendRequest) SetChannel(v Channel)`
 
 SetChannel sets Channel field to given value.
 

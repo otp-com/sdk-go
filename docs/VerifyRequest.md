@@ -4,8 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**OtpId** | **string** |  | 
-**Code** | **string** |  | 
+**OtpId** | **string** | The OTP id returned by send/resend. | 
+**Code** | **string** | The code the recipient entered. | 
 
 ## Methods
 

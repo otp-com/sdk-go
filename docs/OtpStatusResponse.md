@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **OtpId** | **string** |  | 
 **Status** | [**Status**](Status.md) |  | 
-**MaskedRecipient** | **string** |  | 
+**MaskedRecipient** | **string** | Recipient with the middle digits masked. | 
 
 ## Methods
 

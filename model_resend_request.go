@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API. 
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
 
 API version: 1.0.0
 */
@@ -21,9 +21,10 @@ var _ MappedNullable = &ResendRequest{}
 
 // ResendRequest struct for ResendRequest
 type ResendRequest struct {
+	// The OTP id to resend.
 	OtpId string `json:"otp_id"`
-	// Move this OTP onto a specific channel, e.g. \"sms\" when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order. 
-	Channel NullableString `json:"channel,omitempty"`
+	// Move this OTP onto a specific channel, e.g. \"sms\" when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order.
+	Channel NullableChannel `json:"channel,omitempty"`
 }
 
 type _ResendRequest ResendRequest
@@ -71,9 +72,9 @@ func (o *ResendRequest) SetOtpId(v string) {
 }
 
 // GetChannel returns the Channel field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ResendRequest) GetChannel() string {
+func (o *ResendRequest) GetChannel() Channel {
 	if o == nil || IsNil(o.Channel.Get()) {
-		var ret string
+		var ret Channel
 		return ret
 	}
 	return *o.Channel.Get()
@@ -82,7 +83,7 @@ func (o *ResendRequest) GetChannel() string {
 // GetChannelOk returns a tuple with the Channel field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ResendRequest) GetChannelOk() (*string, bool) {
+func (o *ResendRequest) GetChannelOk() (*Channel, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -98,8 +99,8 @@ func (o *ResendRequest) HasChannel() bool {
 	return false
 }
 
-// SetChannel gets a reference to the given NullableString and assigns it to the Channel field.
-func (o *ResendRequest) SetChannel(v string) {
+// SetChannel gets a reference to the given NullableChannel and assigns it to the Channel field.
+func (o *ResendRequest) SetChannel(v Channel) {
 	o.Channel.Set(&v)
 }
 // SetChannelNil sets the value for Channel to be an explicit nil

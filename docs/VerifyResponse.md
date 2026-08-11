@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **OtpId** | **string** |  | 
 **Status** | [**Status**](Status.md) |  | 
-**Matched** | **bool** |  | 
+**Matched** | **bool** | Whether the submitted code matched. | 
 
 ## Methods
 

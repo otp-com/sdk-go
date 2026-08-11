@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API. 
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
 
 API version: 1.0.0
 */
@@ -21,10 +21,10 @@ var _ MappedNullable = &SendRequest{}
 
 // SendRequest struct for SendRequest
 type SendRequest struct {
-	// Phone number in E.164 (e.g. +14155552671) or an email address.
+	// Phone number (E.164) or email address to deliver the OTP to.
 	Recipient string `json:"recipient"`
-	// Message language, e.g. \"en\" or \"tr\".
-	Locale *string `json:"locale,omitempty"`
+	// BCP-47 locale for the message template; falls back to the app default.
+	Locale NullableString `json:"locale,omitempty"`
 }
 
 type _SendRequest SendRequest
@@ -71,36 +71,46 @@ func (o *SendRequest) SetRecipient(v string) {
 	o.Recipient = v
 }
 
-// GetLocale returns the Locale field value if set, zero value otherwise.
+// GetLocale returns the Locale field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *SendRequest) GetLocale() string {
-	if o == nil || IsNil(o.Locale) {
+	if o == nil || IsNil(o.Locale.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Locale
+	return *o.Locale.Get()
 }
 
 // GetLocaleOk returns a tuple with the Locale field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *SendRequest) GetLocaleOk() (*string, bool) {
-	if o == nil || IsNil(o.Locale) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Locale, true
+	return o.Locale.Get(), o.Locale.IsSet()
 }
 
 // HasLocale returns a boolean if a field has been set.
 func (o *SendRequest) HasLocale() bool {
-	if o != nil && !IsNil(o.Locale) {
+	if o != nil && o.Locale.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetLocale gets a reference to the given string and assigns it to the Locale field.
+// SetLocale gets a reference to the given NullableString and assigns it to the Locale field.
 func (o *SendRequest) SetLocale(v string) {
-	o.Locale = &v
+	o.Locale.Set(&v)
+}
+// SetLocaleNil sets the value for Locale to be an explicit nil
+func (o *SendRequest) SetLocaleNil() {
+	o.Locale.Set(nil)
+}
+
+// UnsetLocale ensures that no value is present for Locale, not even an explicit nil
+func (o *SendRequest) UnsetLocale() {
+	o.Locale.Unset()
 }
 
 func (o SendRequest) MarshalJSON() ([]byte, error) {
@@ -114,8 +124,8 @@ func (o SendRequest) MarshalJSON() ([]byte, error) {
 func (o SendRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["recipient"] = o.Recipient
-	if !IsNil(o.Locale) {
-		toSerialize["locale"] = o.Locale
+	if o.Locale.IsSet() {
+		toSerialize["locale"] = o.Locale.Get()
 	}
 	return toSerialize, nil
 }

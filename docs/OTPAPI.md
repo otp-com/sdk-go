@@ -1,13 +1,13 @@
-# \OTPAPI
+# \OtpAPI
 
-All URIs are relative to *https://api.otp.com/api/v1*
+All URIs are relative to *https://api.otp.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**GetOtpStatus**](OTPAPI.md#GetOtpStatus) | **Get** /otp/{otp_id} | Get OTP status
-[**ResendOtp**](OTPAPI.md#ResendOtp) | **Post** /otp/resend | Resend an OTP
-[**SendOtp**](OTPAPI.md#SendOtp) | **Post** /otp/send | Send an OTP
-[**VerifyOtp**](OTPAPI.md#VerifyOtp) | **Post** /otp/verify | Verify an OTP
+[**GetOtpStatus**](OtpAPI.md#GetOtpStatus) | **Get** /api/v1/otp/{otp_id} | Fetch the current status of an OTP.
+[**ResendOtp**](OtpAPI.md#ResendOtp) | **Post** /api/v1/otp/resend | Resend a pending OTP, escalating the channel if configured.
+[**SendOtp**](OtpAPI.md#SendOtp) | **Post** /api/v1/otp/send | Start an OTP: routes a channel and dispatches the code.
+[**VerifyOtp**](OtpAPI.md#VerifyOtp) | **Post** /api/v1/otp/verify | Verify a code against a pending OTP.
 
 
 
@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 > OtpStatusResponse GetOtpStatus(ctx, otpId).Execute()
 
-Get OTP status
+Fetch the current status of an OTP.
 
 ### Example
 
@@ -34,13 +34,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OTPAPI.GetOtpStatus(context.Background(), otpId).Execute()
+	resp, r, err := apiClient.OtpAPI.GetOtpStatus(context.Background(), otpId).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OTPAPI.GetOtpStatus``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OtpAPI.GetOtpStatus``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetOtpStatus`: OtpStatusResponse
-	fmt.Fprintf(os.Stdout, "Response from `OTPAPI.GetOtpStatus`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OtpAPI.GetOtpStatus`: %v\n", resp)
 }
 ```
 
@@ -83,9 +83,7 @@ Name | Type | Description  | Notes
 
 > OtpResponse ResendOtp(ctx).ResendRequest(resendRequest).Execute()
 
-Resend an OTP
-
-
+Resend a pending OTP, escalating the channel if configured.
 
 ### Example
 
@@ -104,13 +102,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OTPAPI.ResendOtp(context.Background()).ResendRequest(resendRequest).Execute()
+	resp, r, err := apiClient.OtpAPI.ResendOtp(context.Background()).ResendRequest(resendRequest).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OTPAPI.ResendOtp``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OtpAPI.ResendOtp``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `ResendOtp`: OtpResponse
-	fmt.Fprintf(os.Stdout, "Response from `OTPAPI.ResendOtp`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OtpAPI.ResendOtp`: %v\n", resp)
 }
 ```
 
@@ -149,7 +147,7 @@ Name | Type | Description  | Notes
 
 > OtpResponse SendOtp(ctx).SendRequest(sendRequest).IdempotencyKey(idempotencyKey).Execute()
 
-Send an OTP
+Start an OTP: routes a channel and dispatches the code.
 
 
 
@@ -166,18 +164,18 @@ import (
 )
 
 func main() {
-	sendRequest := *openapiclient.NewSendRequest("Recipient_example") // SendRequest | 
-	idempotencyKey := "idempotencyKey_example" // string | Replays the prior response for the same key; a reused key with a different body is a 409. (optional)
+	sendRequest := *openapiclient.NewSendRequest("+14155552671") // SendRequest | 
+	idempotencyKey := "idempotencyKey_example" // string | Replay the prior response for a repeated request; a reused key with a different body is a 409. (optional)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OTPAPI.SendOtp(context.Background()).SendRequest(sendRequest).IdempotencyKey(idempotencyKey).Execute()
+	resp, r, err := apiClient.OtpAPI.SendOtp(context.Background()).SendRequest(sendRequest).IdempotencyKey(idempotencyKey).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OTPAPI.SendOtp``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OtpAPI.SendOtp``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `SendOtp`: OtpResponse
-	fmt.Fprintf(os.Stdout, "Response from `OTPAPI.SendOtp`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OtpAPI.SendOtp`: %v\n", resp)
 }
 ```
 
@@ -193,7 +191,7 @@ Other parameters are passed through a pointer to a apiSendOtpRequest struct via 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **sendRequest** | [**SendRequest**](SendRequest.md) |  | 
- **idempotencyKey** | **string** | Replays the prior response for the same key; a reused key with a different body is a 409. | 
+ **idempotencyKey** | **string** | Replay the prior response for a repeated request; a reused key with a different body is a 409. | 
 
 ### Return type
 
@@ -217,9 +215,7 @@ Name | Type | Description  | Notes
 
 > VerifyResponse VerifyOtp(ctx).VerifyRequest(verifyRequest).Execute()
 
-Verify an OTP
-
-
+Verify a code against a pending OTP.
 
 ### Example
 
@@ -234,17 +230,17 @@ import (
 )
 
 func main() {
-	verifyRequest := *openapiclient.NewVerifyRequest("OtpId_example", "Code_example") // VerifyRequest | 
+	verifyRequest := *openapiclient.NewVerifyRequest("OtpId_example", "123456") // VerifyRequest | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OTPAPI.VerifyOtp(context.Background()).VerifyRequest(verifyRequest).Execute()
+	resp, r, err := apiClient.OtpAPI.VerifyOtp(context.Background()).VerifyRequest(verifyRequest).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OTPAPI.VerifyOtp``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OtpAPI.VerifyOtp``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `VerifyOtp`: VerifyResponse
-	fmt.Fprintf(os.Stdout, "Response from `OTPAPI.VerifyOtp`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OtpAPI.VerifyOtp`: %v\n", resp)
 }
 ```
 

@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API. 
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
 
 API version: 1.0.0
 */
@@ -20,12 +20,12 @@ import (
 )
 
 
-// OTPAPIService OTPAPI service
-type OTPAPIService service
+// OtpAPIService OtpAPI service
+type OtpAPIService service
 
 type ApiGetOtpStatusRequest struct {
 	ctx context.Context
-	ApiService *OTPAPIService
+	ApiService *OtpAPIService
 	otpId string
 }
 
@@ -34,13 +34,13 @@ func (r ApiGetOtpStatusRequest) Execute() (*OtpStatusResponse, *http.Response, e
 }
 
 /*
-GetOtpStatus Get OTP status
+GetOtpStatus Fetch the current status of an OTP.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param otpId
  @return ApiGetOtpStatusRequest
 */
-func (a *OTPAPIService) GetOtpStatus(ctx context.Context, otpId string) ApiGetOtpStatusRequest {
+func (a *OtpAPIService) GetOtpStatus(ctx context.Context, otpId string) ApiGetOtpStatusRequest {
 	return ApiGetOtpStatusRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -50,7 +50,7 @@ func (a *OTPAPIService) GetOtpStatus(ctx context.Context, otpId string) ApiGetOt
 
 // Execute executes the request
 //  @return OtpStatusResponse
-func (a *OTPAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatusResponse, *http.Response, error) {
+func (a *OtpAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatusResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -58,12 +58,12 @@ func (a *OTPAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatu
 		localVarReturnValue  *OtpStatusResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.GetOtpStatus")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.GetOtpStatus")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/otp/{otp_id}"
+	localVarPath := localBasePath + "/api/v1/otp/{otp_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"otp_id"+"}", url.PathEscape(parameterValueToString(r.otpId, "otpId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -109,8 +109,19 @@ func (a *OTPAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatu
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -121,7 +132,7 @@ func (a *OTPAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatu
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -147,7 +158,7 @@ func (a *OTPAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatu
 
 type ApiResendOtpRequest struct {
 	ctx context.Context
-	ApiService *OTPAPIService
+	ApiService *OtpAPIService
 	resendRequest *ResendRequest
 }
 
@@ -161,14 +172,12 @@ func (r ApiResendOtpRequest) Execute() (*OtpResponse, *http.Response, error) {
 }
 
 /*
-ResendOtp Resend an OTP
-
-Resend a pending OTP, advancing to the next configured channel (e.g. SMS to WhatsApp).
+ResendOtp Resend a pending OTP, escalating the channel if configured.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiResendOtpRequest
 */
-func (a *OTPAPIService) ResendOtp(ctx context.Context) ApiResendOtpRequest {
+func (a *OtpAPIService) ResendOtp(ctx context.Context) ApiResendOtpRequest {
 	return ApiResendOtpRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -177,7 +186,7 @@ func (a *OTPAPIService) ResendOtp(ctx context.Context) ApiResendOtpRequest {
 
 // Execute executes the request
 //  @return OtpResponse
-func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *http.Response, error) {
+func (a *OtpAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -185,12 +194,12 @@ func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 		localVarReturnValue  *OtpResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.ResendOtp")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.ResendOtp")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/otp/resend"
+	localVarPath := localBasePath + "/api/v1/otp/resend"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -241,7 +250,7 @@ func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -252,7 +261,7 @@ func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -263,7 +272,18 @@ func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 409 {
-			var v Error
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 422 {
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -274,7 +294,18 @@ func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
-			var v Error
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -300,7 +331,7 @@ func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 
 type ApiSendOtpRequest struct {
 	ctx context.Context
-	ApiService *OTPAPIService
+	ApiService *OtpAPIService
 	sendRequest *SendRequest
 	idempotencyKey *string
 }
@@ -310,7 +341,7 @@ func (r ApiSendOtpRequest) SendRequest(sendRequest SendRequest) ApiSendOtpReques
 	return r
 }
 
-// Replays the prior response for the same key; a reused key with a different body is a 409.
+// Replay the prior response for a repeated request; a reused key with a different body is a 409.
 func (r ApiSendOtpRequest) IdempotencyKey(idempotencyKey string) ApiSendOtpRequest {
 	r.idempotencyKey = &idempotencyKey
 	return r
@@ -321,15 +352,14 @@ func (r ApiSendOtpRequest) Execute() (*OtpResponse, *http.Response, error) {
 }
 
 /*
-SendOtp Send an OTP
+SendOtp Start an OTP: routes a channel and dispatches the code.
 
-Generate a one-time password and deliver it to the recipient. The channel is chosen by your app's routing (default order + per-country overrides). Returns an `otp_id` to verify against. When routing picks WhatsApp the code is not sent yet: the response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On every channel the user enters the code and you call `/otp/verify`.
-
+Routing picks the channel from the app config. When it selects WhatsApp the code is not sent yet: the response returns action_url (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On all other channels the code is delivered directly and action_url is null. Either way the user enters the code and you call POST /otp/verify.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiSendOtpRequest
 */
-func (a *OTPAPIService) SendOtp(ctx context.Context) ApiSendOtpRequest {
+func (a *OtpAPIService) SendOtp(ctx context.Context) ApiSendOtpRequest {
 	return ApiSendOtpRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -338,7 +368,7 @@ func (a *OTPAPIService) SendOtp(ctx context.Context) ApiSendOtpRequest {
 
 // Execute executes the request
 //  @return OtpResponse
-func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http.Response, error) {
+func (a *OtpAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -346,12 +376,12 @@ func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 		localVarReturnValue  *OtpResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.SendOtp")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.SendOtp")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/otp/send"
+	localVarPath := localBasePath + "/api/v1/otp/send"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -378,7 +408,7 @@ func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	if r.idempotencyKey != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "Idempotency-Key", r.idempotencyKey, "simple", "")
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "idempotency-key", r.idempotencyKey, "simple", "")
 	}
 	// body params
 	localVarPostBody = r.sendRequest
@@ -405,7 +435,7 @@ func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -416,7 +446,7 @@ func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 409 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -427,7 +457,18 @@ func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
-			var v Error
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -453,7 +494,7 @@ func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 
 type ApiVerifyOtpRequest struct {
 	ctx context.Context
-	ApiService *OTPAPIService
+	ApiService *OtpAPIService
 	verifyRequest *VerifyRequest
 }
 
@@ -467,14 +508,12 @@ func (r ApiVerifyOtpRequest) Execute() (*VerifyResponse, *http.Response, error) 
 }
 
 /*
-VerifyOtp Verify an OTP
-
-Verify the code the user entered. `matched: true` means the code was correct.
+VerifyOtp Verify a code against a pending OTP.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiVerifyOtpRequest
 */
-func (a *OTPAPIService) VerifyOtp(ctx context.Context) ApiVerifyOtpRequest {
+func (a *OtpAPIService) VerifyOtp(ctx context.Context) ApiVerifyOtpRequest {
 	return ApiVerifyOtpRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -483,7 +522,7 @@ func (a *OTPAPIService) VerifyOtp(ctx context.Context) ApiVerifyOtpRequest {
 
 // Execute executes the request
 //  @return VerifyResponse
-func (a *OTPAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse, *http.Response, error) {
+func (a *OtpAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -491,12 +530,12 @@ func (a *OTPAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse
 		localVarReturnValue  *VerifyResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.VerifyOtp")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.VerifyOtp")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/otp/verify"
+	localVarPath := localBasePath + "/api/v1/otp/verify"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -547,7 +586,7 @@ func (a *OTPAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -558,7 +597,7 @@ func (a *OTPAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -569,7 +608,7 @@ func (a *OTPAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
-			var v Error
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
