@@ -276,6 +276,7 @@ components:
       example:
         recipient: "+14155552671"
         locale: en
+        client_ip: 81.2.69.142
       properties:
         recipient:
           description: Phone number (E.164) or email address to deliver the OTP to.
@@ -288,6 +289,14 @@ components:
             default.
           example: en
           maxLength: 10
+          nullable: true
+          type: string
+        client_ip:
+          description: "IP address of the end user who triggered this OTP (IPv4 or\
+            \ IPv6). Strongly recommended: requests without it share a much tighter\
+            \ per-app rate limit, and it feeds abuse protection for your own traffic.\
+            \ Private/reserved addresses count as absent."
+          example: 81.2.69.142
           nullable: true
           type: string
       required:

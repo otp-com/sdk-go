@@ -25,6 +25,8 @@ type SendRequest struct {
 	Recipient string `json:"recipient"`
 	// BCP-47 locale for the message template; falls back to the app default.
 	Locale NullableString `json:"locale,omitempty"`
+	// IP address of the end user who triggered this OTP (IPv4 or IPv6). Strongly recommended: requests without it share a much tighter per-app rate limit, and it feeds abuse protection for your own traffic. Private/reserved addresses count as absent.
+	ClientIp NullableString `json:"client_ip,omitempty"`
 }
 
 type _SendRequest SendRequest
@@ -113,6 +115,48 @@ func (o *SendRequest) UnsetLocale() {
 	o.Locale.Unset()
 }
 
+// GetClientIp returns the ClientIp field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *SendRequest) GetClientIp() string {
+	if o == nil || IsNil(o.ClientIp.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.ClientIp.Get()
+}
+
+// GetClientIpOk returns a tuple with the ClientIp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *SendRequest) GetClientIpOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.ClientIp.Get(), o.ClientIp.IsSet()
+}
+
+// HasClientIp returns a boolean if a field has been set.
+func (o *SendRequest) HasClientIp() bool {
+	if o != nil && o.ClientIp.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetClientIp gets a reference to the given NullableString and assigns it to the ClientIp field.
+func (o *SendRequest) SetClientIp(v string) {
+	o.ClientIp.Set(&v)
+}
+// SetClientIpNil sets the value for ClientIp to be an explicit nil
+func (o *SendRequest) SetClientIpNil() {
+	o.ClientIp.Set(nil)
+}
+
+// UnsetClientIp ensures that no value is present for ClientIp, not even an explicit nil
+func (o *SendRequest) UnsetClientIp() {
+	o.ClientIp.Unset()
+}
+
 func (o SendRequest) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -126,6 +170,9 @@ func (o SendRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize["recipient"] = o.Recipient
 	if o.Locale.IsSet() {
 		toSerialize["locale"] = o.Locale.Get()
+	}
+	if o.ClientIp.IsSet() {
+		toSerialize["client_ip"] = o.ClientIp.Get()
 	}
 	return toSerialize, nil
 }
