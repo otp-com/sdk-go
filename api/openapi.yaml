@@ -21,7 +21,7 @@ servers:
   url: https://api.otp.com
 tags:
 - description: "Send, verify, resend, and check one-time passwords."
-  name: otp
+  name: OTP
 paths:
   /api/v1/otp/send:
     post:
@@ -85,7 +85,7 @@ paths:
       - bearerAuth: []
       summary: "Start an OTP: routes a channel and dispatches the code."
       tags:
-      - otp
+      - OTP
   /api/v1/otp/verify:
     post:
       operationId: verifyOtp
@@ -127,7 +127,7 @@ paths:
       - bearerAuth: []
       summary: Verify a code against a pending OTP.
       tags:
-      - otp
+      - OTP
   /api/v1/otp/resend:
     post:
       operationId: resendOtp
@@ -188,7 +188,7 @@ paths:
       - bearerAuth: []
       summary: "Resend a pending OTP, escalating the channel if configured."
       tags:
-      - otp
+      - OTP
   /api/v1/otp/{otp_id}:
     get:
       operationId: getOtpStatus
@@ -232,7 +232,7 @@ paths:
       - bearerAuth: []
       summary: Fetch the current status of an OTP.
       tags:
-      - otp
+      - OTP
 components:
   schemas:
     ErrorBody:

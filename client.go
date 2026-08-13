@@ -49,7 +49,7 @@ type APIClient struct {
 
 	// API Services
 
-	OtpAPI *OtpAPIService
+	OTPAPI *OTPAPIService
 }
 
 type service struct {
@@ -68,7 +68,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
-	c.OtpAPI = (*OtpAPIService)(&c.common)
+	c.OTPAPI = (*OTPAPIService)(&c.common)
 
 	return c
 }

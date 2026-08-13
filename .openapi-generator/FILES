@@ -7,7 +7,7 @@ configuration.go
 docs/Channel.md
 docs/ErrorBody.md
 docs/ErrorResponse.md
-docs/OtpAPI.md
+docs/OTPAPI.md
 docs/OtpResponse.md
 docs/OtpStatusResponse.md
 docs/ResendRequest.md

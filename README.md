@@ -53,8 +53,11 @@ func main() {
 	ctx := context.WithValue(context.Background(), otp.ContextAccessToken, os.Getenv("OTP_API_KEY"))
 
 	// 1. Send. You pass the recipient; your account routing picks the channel.
+	// SetClientIp = the END USER's IP from your request context, not your server's:
+	// requests without it share a much tighter rate limit.
 	req := otp.NewSendRequest("+14155552671")
 	req.SetLocale("en")
+	req.SetClientIp("81.2.69.142")
 
 	sent, _, err := client.OTPAPI.SendOtp(ctx).SendRequest(*req).Execute()
 	if err != nil {
@@ -182,10 +185,10 @@ client := otp.NewAPIClient(cfg)
 
 | Method | Endpoint | Returns |
 | --- | --- | --- |
-| [`SendOtp`](./docs/OTPApi.md#sendotp) | `POST /otp/send` | [`OtpResponse`](./docs/OtpResponse.md) |
-| [`VerifyOtp`](./docs/OTPApi.md#verifyotp) | `POST /otp/verify` | [`VerifyResponse`](./docs/VerifyResponse.md) |
-| [`ResendOtp`](./docs/OTPApi.md#resendotp) | `POST /otp/resend` | [`OtpResponse`](./docs/OtpResponse.md) |
-| [`GetOtpStatus`](./docs/OTPApi.md#getotpstatus) | `GET /otp/{otp_id}` | [`OtpStatusResponse`](./docs/OtpStatusResponse.md) |
+| [`SendOtp`](./docs/OTPAPI.md#sendotp) | `POST /otp/send` | [`OtpResponse`](./docs/OtpResponse.md) |
+| [`VerifyOtp`](./docs/OTPAPI.md#verifyotp) | `POST /otp/verify` | [`VerifyResponse`](./docs/VerifyResponse.md) |
+| [`ResendOtp`](./docs/OTPAPI.md#resendotp) | `POST /otp/resend` | [`OtpResponse`](./docs/OtpResponse.md) |
+| [`GetOtpStatus`](./docs/OTPAPI.md#getotpstatus) | `GET /otp/{otp_id}` | [`OtpStatusResponse`](./docs/OtpStatusResponse.md) |
 
 Optional fields use the `Nullable*` wrappers: `GetX()` returns the zero value when unset,
 `GetXOk()` tells you whether it was actually present.

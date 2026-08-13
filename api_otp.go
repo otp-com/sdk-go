@@ -20,12 +20,12 @@ import (
 )
 
 
-// OtpAPIService OtpAPI service
-type OtpAPIService service
+// OTPAPIService OTPAPI service
+type OTPAPIService service
 
 type ApiGetOtpStatusRequest struct {
 	ctx context.Context
-	ApiService *OtpAPIService
+	ApiService *OTPAPIService
 	otpId string
 }
 
@@ -40,7 +40,7 @@ GetOtpStatus Fetch the current status of an OTP.
  @param otpId
  @return ApiGetOtpStatusRequest
 */
-func (a *OtpAPIService) GetOtpStatus(ctx context.Context, otpId string) ApiGetOtpStatusRequest {
+func (a *OTPAPIService) GetOtpStatus(ctx context.Context, otpId string) ApiGetOtpStatusRequest {
 	return ApiGetOtpStatusRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -50,7 +50,7 @@ func (a *OtpAPIService) GetOtpStatus(ctx context.Context, otpId string) ApiGetOt
 
 // Execute executes the request
 //  @return OtpStatusResponse
-func (a *OtpAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatusResponse, *http.Response, error) {
+func (a *OTPAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatusResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -58,7 +58,7 @@ func (a *OtpAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatu
 		localVarReturnValue  *OtpStatusResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.GetOtpStatus")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.GetOtpStatus")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -158,7 +158,7 @@ func (a *OtpAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatu
 
 type ApiResendOtpRequest struct {
 	ctx context.Context
-	ApiService *OtpAPIService
+	ApiService *OTPAPIService
 	resendRequest *ResendRequest
 }
 
@@ -177,7 +177,7 @@ ResendOtp Resend a pending OTP, escalating the channel if configured.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiResendOtpRequest
 */
-func (a *OtpAPIService) ResendOtp(ctx context.Context) ApiResendOtpRequest {
+func (a *OTPAPIService) ResendOtp(ctx context.Context) ApiResendOtpRequest {
 	return ApiResendOtpRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -186,7 +186,7 @@ func (a *OtpAPIService) ResendOtp(ctx context.Context) ApiResendOtpRequest {
 
 // Execute executes the request
 //  @return OtpResponse
-func (a *OtpAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *http.Response, error) {
+func (a *OTPAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -194,7 +194,7 @@ func (a *OtpAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 		localVarReturnValue  *OtpResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.ResendOtp")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.ResendOtp")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -331,7 +331,7 @@ func (a *OtpAPIService) ResendOtpExecute(r ApiResendOtpRequest) (*OtpResponse, *
 
 type ApiSendOtpRequest struct {
 	ctx context.Context
-	ApiService *OtpAPIService
+	ApiService *OTPAPIService
 	sendRequest *SendRequest
 	idempotencyKey *string
 }
@@ -359,7 +359,7 @@ Routing picks the channel from the app config. When it selects WhatsApp the code
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiSendOtpRequest
 */
-func (a *OtpAPIService) SendOtp(ctx context.Context) ApiSendOtpRequest {
+func (a *OTPAPIService) SendOtp(ctx context.Context) ApiSendOtpRequest {
 	return ApiSendOtpRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -368,7 +368,7 @@ func (a *OtpAPIService) SendOtp(ctx context.Context) ApiSendOtpRequest {
 
 // Execute executes the request
 //  @return OtpResponse
-func (a *OtpAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http.Response, error) {
+func (a *OTPAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -376,7 +376,7 @@ func (a *OtpAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 		localVarReturnValue  *OtpResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.SendOtp")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.SendOtp")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -494,7 +494,7 @@ func (a *OtpAPIService) SendOtpExecute(r ApiSendOtpRequest) (*OtpResponse, *http
 
 type ApiVerifyOtpRequest struct {
 	ctx context.Context
-	ApiService *OtpAPIService
+	ApiService *OTPAPIService
 	verifyRequest *VerifyRequest
 }
 
@@ -513,7 +513,7 @@ VerifyOtp Verify a code against a pending OTP.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiVerifyOtpRequest
 */
-func (a *OtpAPIService) VerifyOtp(ctx context.Context) ApiVerifyOtpRequest {
+func (a *OTPAPIService) VerifyOtp(ctx context.Context) ApiVerifyOtpRequest {
 	return ApiVerifyOtpRequest{
 		ApiService: a,
 		ctx: ctx,
@@ -522,7 +522,7 @@ func (a *OtpAPIService) VerifyOtp(ctx context.Context) ApiVerifyOtpRequest {
 
 // Execute executes the request
 //  @return VerifyResponse
-func (a *OtpAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse, *http.Response, error) {
+func (a *OTPAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -530,7 +530,7 @@ func (a *OtpAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse
 		localVarReturnValue  *VerifyResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OtpAPIService.VerifyOtp")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OTPAPIService.VerifyOtp")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
