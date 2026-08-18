@@ -1,0 +1,49 @@
+name: Release
+# Manual release: enter a version, it builds and vets, then tags and creates a GitHub release.
+# Nothing is uploaded anywhere: a Go module version *is* its tag, which the module proxy then fetches.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, without a leading v (e.g. 1.1.0)'
+        required: true
+        type: string
+permissions:
+  contents: write # push the tag, create the release
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go build ./...
+      - run: go vet ./...
+
+      - name: Tag and push
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$' \
+            || { echo "Not a semver version: '$VERSION'. Enter it without a leading v."; exit 1; }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "v$VERSION" -m "release: v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create GitHub release
+        env:
+          VERSION: ${{ inputs.version }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: gh release create "v$VERSION" --generate-notes
+
+      # Asking the proxy for the version is what makes it cache it, so the first `go get` is not the
+      # one that waits. Advisory only: the proxy can lag behind the push by a few minutes.
+      - name: Warm the module proxy
+        continue-on-error: true
+        env:
+          VERSION: ${{ inputs.version }}
+        run: GOPROXY=https://proxy.golang.org GOFLAGS= go list -m "github.com/otp-com/sdk-go@v$VERSION"
