@@ -16,19 +16,17 @@ Requires Go 1.23+.
 Installed straight from GitHub; Go has no separate package registry to publish to.
 
 ```sh
-go get github.com/otp-com/sdk-go@latest
+go get github.com/otp-com/sdk-go@v1.1.0
 ```
 
-There is no version tag yet, so `@latest` resolves to a pseudo-version of the `main` branch
-(`v0.0.0-<date>-<commit>`). That is what lands in your `go.mod`, and `go.sum` pins the exact commit,
-so builds stay reproducible. To pick a specific commit or branch yourself:
+`@latest` resolves to the newest release tag. Either way the resolved version lands in your `go.mod`
+and `go.sum` pins its checksum, so builds stay reproducible. To follow the branch or pin a commit
+instead:
 
 ```sh
-go get github.com/otp-com/sdk-go@<commit-sha>
 go get github.com/otp-com/sdk-go@main
+go get github.com/otp-com/sdk-go@<commit-sha>
 ```
-
-Once the repository is tagged, switch to `go get github.com/otp-com/sdk-go@v1.0.0`.
 
 ## Quickstart
 
