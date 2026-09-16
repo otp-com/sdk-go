@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **OtpId** | **string** | The OTP id to resend. | 
-**Channel** | Pointer to [**NullableChannel**](Channel.md) | Move this OTP onto a specific channel, e.g. \&quot;sms\&quot; when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order. | [optional] 
+**Channel** | Pointer to [**NullableChannel**](Channel.md) | Move this OTP onto a specific channel, e.g. \&quot;sms\&quot; when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order, or to repeat the last one once the order is exhausted. | [optional] 
 
 ## Methods
 

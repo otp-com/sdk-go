@@ -15,56 +15,52 @@ import (
 	"fmt"
 )
 
-// Channel Channel the OTP was dispatched on; null until routed.
-type Channel string
+// RecipientType the model 'RecipientType'
+type RecipientType string
 
-// List of Channel
+// List of RecipientType
 const (
-	SMS Channel = "sms"
-	WHATSAPP Channel = "whatsapp"
-	EMAIL Channel = "email"
-	TELEGRAM Channel = "telegram"
+	PHONE RecipientType = "phone"
+	EMAIL RecipientType = "email"
 )
 
-// All allowed values of Channel enum
-var AllowedChannelEnumValues = []Channel{
-	"sms",
-	"whatsapp",
+// All allowed values of RecipientType enum
+var AllowedRecipientTypeEnumValues = []RecipientType{
+	"phone",
 	"email",
-	"telegram",
 }
 
-func (v *Channel) UnmarshalJSON(src []byte) error {
+func (v *RecipientType) UnmarshalJSON(src []byte) error {
 	var value string
 	err := json.Unmarshal(src, &value)
 	if err != nil {
 		return err
 	}
-	enumTypeValue := Channel(value)
-	for _, existing := range AllowedChannelEnumValues {
+	enumTypeValue := RecipientType(value)
+	for _, existing := range AllowedRecipientTypeEnumValues {
 		if existing == enumTypeValue {
 			*v = enumTypeValue
 			return nil
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid Channel", value)
+	return fmt.Errorf("%+v is not a valid RecipientType", value)
 }
 
-// NewChannelFromValue returns a pointer to a valid Channel
+// NewRecipientTypeFromValue returns a pointer to a valid RecipientType
 // for the value passed as argument, or an error if the value passed is not allowed by the enum
-func NewChannelFromValue(v string) (*Channel, error) {
-	ev := Channel(v)
+func NewRecipientTypeFromValue(v string) (*RecipientType, error) {
+	ev := RecipientType(v)
 	if ev.IsValid() {
 		return &ev, nil
 	} else {
-		return nil, fmt.Errorf("invalid value '%v' for Channel: valid values are %v", v, AllowedChannelEnumValues)
+		return nil, fmt.Errorf("invalid value '%v' for RecipientType: valid values are %v", v, AllowedRecipientTypeEnumValues)
 	}
 }
 
 // IsValid return true if the value is valid for the enum, false otherwise
-func (v Channel) IsValid() bool {
-	for _, existing := range AllowedChannelEnumValues {
+func (v RecipientType) IsValid() bool {
+	for _, existing := range AllowedRecipientTypeEnumValues {
 		if existing == v {
 			return true
 		}
@@ -72,43 +68,43 @@ func (v Channel) IsValid() bool {
 	return false
 }
 
-// Ptr returns reference to Channel value
-func (v Channel) Ptr() *Channel {
+// Ptr returns reference to RecipientType value
+func (v RecipientType) Ptr() *RecipientType {
 	return &v
 }
 
-type NullableChannel struct {
-	value *Channel
+type NullableRecipientType struct {
+	value *RecipientType
 	isSet bool
 }
 
-func (v NullableChannel) Get() *Channel {
+func (v NullableRecipientType) Get() *RecipientType {
 	return v.value
 }
 
-func (v *NullableChannel) Set(val *Channel) {
+func (v *NullableRecipientType) Set(val *RecipientType) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableChannel) IsSet() bool {
+func (v NullableRecipientType) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableChannel) Unset() {
+func (v *NullableRecipientType) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableChannel(val *Channel) *NullableChannel {
-	return &NullableChannel{value: val, isSet: true}
+func NewNullableRecipientType(val *RecipientType) *NullableRecipientType {
+	return &NullableRecipientType{value: val, isSet: true}
 }
 
-func (v NullableChannel) MarshalJSON() ([]byte, error) {
+func (v NullableRecipientType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableChannel) UnmarshalJSON(src []byte) error {
+func (v *NullableRecipientType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.  If your app uses one of the mobile SDKs, the device verifies against the client API and receives a `verification_token` instead of a result. Exchange that token here, with your server key (`POST /verifications/exchange`), to learn which recipient was verified. What an app tells your backend about its own verification is unverifiable, so the token is the whole security model.
 
 API version: 1.0.0
 */
@@ -23,7 +23,7 @@ var _ MappedNullable = &ResendRequest{}
 type ResendRequest struct {
 	// The OTP id to resend.
 	OtpId string `json:"otp_id"`
-	// Move this OTP onto a specific channel, e.g. \"sms\" when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order.
+	// Move this OTP onto a specific channel, e.g. \"sms\" when the recipient has no WhatsApp. The channel must be enabled for your app and the recipient. Omit to advance to the next channel in your routing order, or to repeat the last one once the order is exhausted.
 	Channel NullableChannel `json:"channel,omitempty"`
 }
 

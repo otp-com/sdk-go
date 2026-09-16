@@ -16,59 +16,60 @@ import (
 	"fmt"
 )
 
-// checks if the ErrorResponse type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ErrorResponse{}
+// checks if the VerificationExchangeRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &VerificationExchangeRequest{}
 
-// ErrorResponse struct for ErrorResponse
-type ErrorResponse struct {
-	Error ErrorBody `json:"error"`
+// VerificationExchangeRequest struct for VerificationExchangeRequest
+type VerificationExchangeRequest struct {
+	// The verification_token your app received from POST /client/otp/verify.
+	VerificationToken string `json:"verification_token"`
 }
 
-type _ErrorResponse ErrorResponse
+type _VerificationExchangeRequest VerificationExchangeRequest
 
-// NewErrorResponse instantiates a new ErrorResponse object
+// NewVerificationExchangeRequest instantiates a new VerificationExchangeRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewErrorResponse(error_ ErrorBody) *ErrorResponse {
-	this := ErrorResponse{}
-	this.Error = error_
+func NewVerificationExchangeRequest(verificationToken string) *VerificationExchangeRequest {
+	this := VerificationExchangeRequest{}
+	this.VerificationToken = verificationToken
 	return &this
 }
 
-// NewErrorResponseWithDefaults instantiates a new ErrorResponse object
+// NewVerificationExchangeRequestWithDefaults instantiates a new VerificationExchangeRequest object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewErrorResponseWithDefaults() *ErrorResponse {
-	this := ErrorResponse{}
+func NewVerificationExchangeRequestWithDefaults() *VerificationExchangeRequest {
+	this := VerificationExchangeRequest{}
 	return &this
 }
 
-// GetError returns the Error field value
-func (o *ErrorResponse) GetError() ErrorBody {
+// GetVerificationToken returns the VerificationToken field value
+func (o *VerificationExchangeRequest) GetVerificationToken() string {
 	if o == nil {
-		var ret ErrorBody
+		var ret string
 		return ret
 	}
 
-	return o.Error
+	return o.VerificationToken
 }
 
-// GetErrorOk returns a tuple with the Error field value
+// GetVerificationTokenOk returns a tuple with the VerificationToken field value
 // and a boolean to check if the value has been set.
-func (o *ErrorResponse) GetErrorOk() (*ErrorBody, bool) {
+func (o *VerificationExchangeRequest) GetVerificationTokenOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Error, true
+	return &o.VerificationToken, true
 }
 
-// SetError sets field value
-func (o *ErrorResponse) SetError(v ErrorBody) {
-	o.Error = v
+// SetVerificationToken sets field value
+func (o *VerificationExchangeRequest) SetVerificationToken(v string) {
+	o.VerificationToken = v
 }
 
-func (o ErrorResponse) MarshalJSON() ([]byte, error) {
+func (o VerificationExchangeRequest) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -76,18 +77,18 @@ func (o ErrorResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o ErrorResponse) ToMap() (map[string]interface{}, error) {
+func (o VerificationExchangeRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["error"] = o.Error
+	toSerialize["verification_token"] = o.VerificationToken
 	return toSerialize, nil
 }
 
-func (o *ErrorResponse) UnmarshalJSON(data []byte) (err error) {
+func (o *VerificationExchangeRequest) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"error",
+		"verification_token",
 	}
 
 	allProperties := make(map[string]interface{})
@@ -104,53 +105,53 @@ func (o *ErrorResponse) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varErrorResponse := _ErrorResponse{}
+	varVerificationExchangeRequest := _VerificationExchangeRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varErrorResponse)
+	err = decoder.Decode(&varVerificationExchangeRequest)
 
 	if err != nil {
 		return err
 	}
 
-	*o = ErrorResponse(varErrorResponse)
+	*o = VerificationExchangeRequest(varVerificationExchangeRequest)
 
 	return err
 }
 
-type NullableErrorResponse struct {
-	value *ErrorResponse
+type NullableVerificationExchangeRequest struct {
+	value *VerificationExchangeRequest
 	isSet bool
 }
 
-func (v NullableErrorResponse) Get() *ErrorResponse {
+func (v NullableVerificationExchangeRequest) Get() *VerificationExchangeRequest {
 	return v.value
 }
 
-func (v *NullableErrorResponse) Set(val *ErrorResponse) {
+func (v *NullableVerificationExchangeRequest) Set(val *VerificationExchangeRequest) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableErrorResponse) IsSet() bool {
+func (v NullableVerificationExchangeRequest) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableErrorResponse) Unset() {
+func (v *NullableVerificationExchangeRequest) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableErrorResponse(val *ErrorResponse) *NullableErrorResponse {
-	return &NullableErrorResponse{value: val, isSet: true}
+func NewNullableVerificationExchangeRequest(val *VerificationExchangeRequest) *NullableVerificationExchangeRequest {
+	return &NullableVerificationExchangeRequest{value: val, isSet: true}
 }
 
-func (v NullableErrorResponse) MarshalJSON() ([]byte, error) {
+func (v NullableVerificationExchangeRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableErrorResponse) UnmarshalJSON(src []byte) error {
+func (v *NullableVerificationExchangeRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

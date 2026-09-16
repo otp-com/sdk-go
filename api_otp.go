@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.  If your app uses one of the mobile SDKs, the device verifies against the client API and receives a `verification_token` instead of a result. Exchange that token here, with your server key (`POST /verifications/exchange`), to learn which recipient was verified. What an app tells your backend about its own verification is unverifiable, so the token is the whole security model.
 
 API version: 1.0.0
 */
@@ -132,6 +132,17 @@ func (a *OTPAPIService) GetOtpStatusExecute(r ApiGetOtpStatusRequest) (*OtpStatu
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
@@ -608,6 +619,17 @@ func (a *OTPAPIService) VerifyOtpExecute(r ApiVerifyOtpRequest) (*VerifyResponse
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 503 {
 			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {

@@ -24,3 +24,8 @@
 
 # Hand-written, not generated: the README is the front door of a public SDK, so we own it.
 README.md
+
+# The module definition, resolved by `go mod tidy`. The generator emits an empty require block and a
+# go.sum of its own template's dependencies, which drops the testify the generated tests import.
+go.mod
+go.sum
