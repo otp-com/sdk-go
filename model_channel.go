@@ -20,10 +20,10 @@ type Channel string
 
 // List of Channel
 const (
-	SMS Channel = "sms"
-	WHATSAPP Channel = "whatsapp"
-	EMAIL Channel = "email"
-	TELEGRAM Channel = "telegram"
+	CHANNEL_SMS Channel = "sms"
+	CHANNEL_WHATSAPP Channel = "whatsapp"
+	CHANNEL_EMAIL Channel = "email"
+	CHANNEL_TELEGRAM Channel = "telegram"
 )
 
 // All allowed values of Channel enum

@@ -16,7 +16,7 @@ Requires Go 1.23+.
 Installed straight from GitHub; Go has no separate package registry to publish to.
 
 ```sh
-go get github.com/otp-com/sdk-go@v1.1.0
+go get github.com/otp-com/sdk-go
 ```
 
 `@latest` resolves to the newest release tag. Either way the resolved version lands in your `go.mod`

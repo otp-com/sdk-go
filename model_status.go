@@ -20,10 +20,10 @@ type Status string
 
 // List of Status
 const (
-	PENDING Status = "pending"
-	APPROVED Status = "approved"
-	FAILED Status = "failed"
-	EXPIRED Status = "expired"
+	STATUS_PENDING Status = "pending"
+	STATUS_APPROVED Status = "approved"
+	STATUS_FAILED Status = "failed"
+	STATUS_EXPIRED Status = "expired"
 )
 
 // All allowed values of Status enum

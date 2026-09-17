@@ -27,12 +27,14 @@ jobs:
             case "$f" in ''|/*|*..*) continue ;; esac
             rm -f "./$f"
           done < .openapi-generator/FILES
+      # enumClassPrefix: Go has no enum scoping, so two enums sharing a value (Channel.email,
+      # RecipientType.email) would both become the constant EMAIL and fail to compile.
       - name: Generate client
         run: |
           docker run --rm -v "$PWD":/local openapitools/openapi-generator-cli generate \
             -i /local/openapi.yaml -g go -o /local \
             --git-user-id otp-com --git-repo-id sdk-go \
-            --additional-properties=packageName=otp,isGoSubmodule=false
+            --additional-properties=packageName=otp,isGoSubmodule=false,enumClassPrefix=true
           rm -f openapi.yaml
       - name: Open PR
         uses: peter-evans/create-pull-request@v6

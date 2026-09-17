@@ -20,8 +20,8 @@ type RecipientType string
 
 // List of RecipientType
 const (
-	PHONE RecipientType = "phone"
-	EMAIL RecipientType = "email"
+	RECIPIENTTYPE_PHONE RecipientType = "phone"
+	RECIPIENTTYPE_EMAIL RecipientType = "email"
 )
 
 // All allowed values of RecipientType enum
