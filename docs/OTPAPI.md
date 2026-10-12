@@ -17,6 +17,8 @@ Method | HTTP request | Description
 
 Fetch the current status of an OTP.
 
+
+
 ### Example
 
 ```go
@@ -84,6 +86,8 @@ Name | Type | Description  | Notes
 > OtpResponse ResendOtp(ctx).ResendRequest(resendRequest).Execute()
 
 Resend a pending OTP, escalating the channel if configured.
+
+
 
 ### Example
 
@@ -216,6 +220,8 @@ Name | Type | Description  | Notes
 > VerifyResponse VerifyOtp(ctx).VerifyRequest(verifyRequest).Execute()
 
 Verify a code against a pending OTP.
+
+
 
 ### Example
 

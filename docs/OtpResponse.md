@@ -8,13 +8,14 @@ Name | Type | Description | Notes
 **Status** | [**Status**](Status.md) |  | 
 **Channel** | [**NullableChannel**](Channel.md) | Channel the OTP was dispatched on; null until routed. | 
 **MaskedRecipient** | **string** | Recipient with the middle digits masked. | 
-**ActionUrl** | Pointer to **NullableString** | WhatsApp link the user opens to receive the code: they send us the prefilled message and we reply with the code over WhatsApp, then they enter it and you call POST /otp/verify. Present only when dispatched on the whatsapp channel; null otherwise. | [optional] 
+**ActionUrl** | Pointer to **NullableString** | WhatsApp link the user opens: they send us the prefilled message and we reply with the code over WhatsApp (completion \&quot;code\&quot;) or approve the OTP on that message (completion \&quot;inbound\&quot;). Present only when dispatched on the whatsapp channel; null otherwise. Null under the template mode, where the code is pushed directly and the flow is the same as SMS. | [optional] 
+**Completion** | [**Completion**](Completion.md) | How this OTP completes. \&quot;code\&quot;: the user enters the code and you call POST /otp/verify. \&quot;inbound\&quot;: the user opens action_url and sends the prefilled WhatsApp message; that message approves the OTP, no code is sent. Poll GET /otp/:id or take the otp.approved webhook. | 
 
 ## Methods
 
 ### NewOtpResponse
 
-`func NewOtpResponse(otpId string, status Status, channel NullableChannel, maskedRecipient string, ) *OtpResponse`
+`func NewOtpResponse(otpId string, status Status, channel NullableChannel, maskedRecipient string, completion Completion, ) *OtpResponse`
 
 NewOtpResponse instantiates a new OtpResponse object
 This constructor will assign default values to properties that have it defined,
@@ -154,6 +155,26 @@ HasActionUrl returns a boolean if a field has been set.
 `func (o *OtpResponse) UnsetActionUrl()`
 
 UnsetActionUrl ensures that no value is present for ActionUrl, not even an explicit nil
+### GetCompletion
+
+`func (o *OtpResponse) GetCompletion() Completion`
+
+GetCompletion returns the Completion field if non-nil, zero value otherwise.
+
+### GetCompletionOk
+
+`func (o *OtpResponse) GetCompletionOk() (*Completion, bool)`
+
+GetCompletionOk returns a tuple with the Completion field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCompletion
+
+`func (o *OtpResponse) SetCompletion(v Completion)`
+
+SetCompletion sets Completion field to given value.
+
+
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

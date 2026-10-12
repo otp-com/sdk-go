@@ -66,6 +66,7 @@ func main() {
 	sent.GetChannel()         // "sms" | "whatsapp" | "email" | "telegram"
 	sent.GetMaskedRecipient() // "+14****71", safe to show the user
 	sent.GetActionUrl()       // WhatsApp only, see below
+	sent.GetCompletion()      // "code" | "inbound", see below
 
 	// 2. Verify whatever the user typed in.
 	result, _, err := client.OTPAPI.VerifyOtp(ctx).
@@ -99,22 +100,37 @@ sent, _, err := client.OTPAPI.SendOtp(ctx).
 	Execute()
 ```
 
-## WhatsApp: the code comes back to the user
+## WhatsApp: how the OTP completes
 
-Verification is identical on every channel, but WhatsApp delivery has one extra step. When routing
-picks WhatsApp, the code has **not** been sent yet and the response carries an action URL:
+Every send, resend and status response carries `completion`, which tells you how this OTP finishes.
+SMS, email and Telegram always complete with `code`. Which WhatsApp mode applies is configured per
+account:
+
+| `completion` | action URL | What happens |
+| --- | --- | --- |
+| `code` | null | The code was delivered (any channel, or WhatsApp in template mode). The user enters it; you call `VerifyOtp`. |
+| `code` | set | WhatsApp code-back. The user opens the link and sends us the prefilled message; we reply with the code. Then `VerifyOtp` as on SMS. |
+| `inbound` | set | WhatsApp inbound approval. The prefilled message itself approves the OTP; there is no code. Poll `GetOtpStatus` every 3 to 5 seconds until the status leaves `pending`, or take the `otp.approved` webhook. |
 
 ```go
 if url, ok := sent.GetActionUrlOk(); ok {
-	// Open it for the user. They send us the prefilled message from their own WhatsApp,
-	// we reply with the code, and the OTP stays "pending" until they enter it.
+	// Open it for the user. They send us the prefilled message from their own WhatsApp.
 	redirect(*url)
+}
+
+if sent.GetCompletion() == otp.COMPLETION_INBOUND {
+	// No code is coming. Wait for that message to approve the OTP.
+	current, _, err := client.OTPAPI.GetOtpStatus(ctx, sent.GetOtpId()).Execute()
+} else {
+	// A code was (or will be) delivered; VerifyOtp with whatever the user typed in.
 }
 ```
 
-Then call `VerifyOtp` exactly as on SMS. The action URL is null on every other channel. Don't poll
-for a WhatsApp OTP to approve itself: nothing leaves `pending` without a `VerifyOtp` call. If the
-user has no WhatsApp, resend on a channel they do have.
+Calling `VerifyOtp` on an `inbound` OTP never matches while it is pending and spends an attempt;
+once approved it simply reports the approved OTP. Sandbox OTPs always complete with `code`; on
+WhatsApp they still return a sample action URL, verify with the sandbox code. If the user has no
+WhatsApp, resend on a channel they do have: leaving WhatsApp for a code channel sets `completion`
+back to `code`.
 
 ## Resending
 
@@ -138,8 +154,23 @@ current, _, err := client.OTPAPI.GetOtpStatus(ctx, sent.GetOtpId()).Execute()
 current.GetStatus() // "pending" | "approved" | "failed" | "expired"
 ```
 
-Useful for reconciliation and support tooling. It is not a substitute for `VerifyOtp`, which is what
-actually approves an OTP.
+On `code` OTPs this is for reconciliation and support tooling, not a substitute for `VerifyOtp`,
+which is what actually approves them. On `inbound` OTPs it is how you learn the approval without
+the webhook.
+
+## Exchanging a mobile verification token
+
+If your app uses one of the mobile SDKs, the device verifies against the client API and receives a
+`verification_token` instead of a result. Exchange it on your backend to learn which recipient was
+actually verified; what the app claims about its own verification is not trustworthy.
+
+```go
+verified, _, err := client.VerificationsAPI.ExchangeVerification(ctx).
+	VerificationExchangeRequest(*otp.NewVerificationExchangeRequest(tokenFromTheApp)).
+	Execute()
+
+verified.GetRecipient() // the number or address the device actually proved
+```
 
 ## Errors
 
@@ -187,6 +218,7 @@ client := otp.NewAPIClient(cfg)
 | [`VerifyOtp`](./docs/OTPAPI.md#verifyotp) | `POST /otp/verify` | [`VerifyResponse`](./docs/VerifyResponse.md) |
 | [`ResendOtp`](./docs/OTPAPI.md#resendotp) | `POST /otp/resend` | [`OtpResponse`](./docs/OtpResponse.md) |
 | [`GetOtpStatus`](./docs/OTPAPI.md#getotpstatus) | `GET /otp/{otp_id}` | [`OtpStatusResponse`](./docs/OtpStatusResponse.md) |
+| [`ExchangeVerification`](./docs/VerificationsAPI.md#exchangeverification) | `POST /verifications/exchange` | [`VerificationExchangeResponse`](./docs/VerificationExchangeResponse.md) |
 
 Optional fields use the `Nullable*` wrappers: `GetX()` returns the zero value when unset,
 `GetXOk()` tells you whether it was actually present.

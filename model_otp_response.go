@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.  If your app uses one of the mobile SDKs, the device verifies against the client API and receives a `verification_token` instead of a result. Exchange that token here, with your server key (`POST /verifications/exchange`), to learn which recipient was verified. What an app tells your backend about its own verification is unverifiable, so the token is the whole security model.
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  Every send, resend and status response carries `completion`. `code` means the user enters a code and you call verify. Every non-WhatsApp channel and WhatsApp under the template mode deliver it directly; WhatsApp under code-back instead returns an `action_url` (a wa.me link) the user opens to send us a prefilled message, and we reply with the code. `inbound` means that prefilled message itself approves the OTP: there is no code, and you learn the outcome by polling `GET /otp/:id` or from the `otp.approved` webhook. Which WhatsApp mode applies is configured per account.  If your app uses one of the mobile SDKs, the device verifies against the client API and receives a `verification_token` instead of a result. Exchange that token here, with your server key (`POST /verifications/exchange`), to learn which recipient was verified. What an app tells your backend about its own verification is unverifiable, so the token is the whole security model.
 
 API version: 1.0.0
 */
@@ -27,8 +27,10 @@ type OtpResponse struct {
 	Channel NullableChannel `json:"channel"`
 	// Recipient with the middle digits masked.
 	MaskedRecipient string `json:"masked_recipient"`
-	// WhatsApp link the user opens to receive the code: they send us the prefilled message and we reply with the code over WhatsApp, then they enter it and you call POST /otp/verify. Present only when dispatched on the whatsapp channel; null otherwise.
+	// WhatsApp link the user opens: they send us the prefilled message and we reply with the code over WhatsApp (completion \"code\") or approve the OTP on that message (completion \"inbound\"). Present only when dispatched on the whatsapp channel; null otherwise. Null under the template mode, where the code is pushed directly and the flow is the same as SMS.
 	ActionUrl NullableString `json:"action_url,omitempty"`
+	// How this OTP completes. \"code\": the user enters the code and you call POST /otp/verify. \"inbound\": the user opens action_url and sends the prefilled WhatsApp message; that message approves the OTP, no code is sent. Poll GET /otp/:id or take the otp.approved webhook.
+	Completion Completion `json:"completion"`
 }
 
 type _OtpResponse OtpResponse
@@ -37,12 +39,13 @@ type _OtpResponse OtpResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOtpResponse(otpId string, status Status, channel NullableChannel, maskedRecipient string) *OtpResponse {
+func NewOtpResponse(otpId string, status Status, channel NullableChannel, maskedRecipient string, completion Completion) *OtpResponse {
 	this := OtpResponse{}
 	this.OtpId = otpId
 	this.Status = status
 	this.Channel = channel
 	this.MaskedRecipient = maskedRecipient
+	this.Completion = completion
 	return &this
 }
 
@@ -194,6 +197,30 @@ func (o *OtpResponse) UnsetActionUrl() {
 	o.ActionUrl.Unset()
 }
 
+// GetCompletion returns the Completion field value
+func (o *OtpResponse) GetCompletion() Completion {
+	if o == nil {
+		var ret Completion
+		return ret
+	}
+
+	return o.Completion
+}
+
+// GetCompletionOk returns a tuple with the Completion field value
+// and a boolean to check if the value has been set.
+func (o *OtpResponse) GetCompletionOk() (*Completion, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Completion, true
+}
+
+// SetCompletion sets field value
+func (o *OtpResponse) SetCompletion(v Completion) {
+	o.Completion = v
+}
+
 func (o OtpResponse) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -211,6 +238,7 @@ func (o OtpResponse) ToMap() (map[string]interface{}, error) {
 	if o.ActionUrl.IsSet() {
 		toSerialize["action_url"] = o.ActionUrl.Get()
 	}
+	toSerialize["completion"] = o.Completion
 	return toSerialize, nil
 }
 
@@ -223,6 +251,7 @@ func (o *OtpResponse) UnmarshalJSON(data []byte) (err error) {
 		"status",
 		"channel",
 		"masked_recipient",
+		"completion",
 	}
 
 	allProperties := make(map[string]interface{})

@@ -7,12 +7,13 @@ Name | Type | Description | Notes
 **OtpId** | **string** |  | 
 **Status** | [**Status**](Status.md) |  | 
 **MaskedRecipient** | **string** | Recipient with the middle digits masked. | 
+**Completion** | [**Completion**](Completion.md) | How this OTP completes. \&quot;code\&quot;: the user enters the code and you call POST /otp/verify. \&quot;inbound\&quot;: the user opens action_url and sends the prefilled WhatsApp message; that message approves the OTP, no code is sent. Poll GET /otp/:id or take the otp.approved webhook. | 
 
 ## Methods
 
 ### NewOtpStatusResponse
 
-`func NewOtpStatusResponse(otpId string, status Status, maskedRecipient string, ) *OtpStatusResponse`
+`func NewOtpStatusResponse(otpId string, status Status, maskedRecipient string, completion Completion, ) *OtpStatusResponse`
 
 NewOtpStatusResponse instantiates a new OtpStatusResponse object
 This constructor will assign default values to properties that have it defined,
@@ -85,6 +86,26 @@ and a boolean to check if the value has been set.
 `func (o *OtpStatusResponse) SetMaskedRecipient(v string)`
 
 SetMaskedRecipient sets MaskedRecipient field to given value.
+
+
+### GetCompletion
+
+`func (o *OtpStatusResponse) GetCompletion() Completion`
+
+GetCompletion returns the Completion field if non-nil, zero value otherwise.
+
+### GetCompletionOk
+
+`func (o *OtpStatusResponse) GetCompletionOk() (*Completion, bool)`
+
+GetCompletionOk returns a tuple with the Completion field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCompletion
+
+`func (o *OtpStatusResponse) SetCompletion(v Completion)`
+
+SetCompletion sets Completion field to given value.
 
 
 

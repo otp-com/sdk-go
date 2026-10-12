@@ -1,7 +1,7 @@
 /*
 otp OTP API
 
-Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  When routing picks WhatsApp the code is not sent yet: the send response carries an `action_url` (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. Verification is identical on every channel.  If your app uses one of the mobile SDKs, the device verifies against the client API and receives a `verification_token` instead of a result. Exchange that token here, with your server key (`POST /verifications/exchange`), to learn which recipient was verified. What an app tells your backend about its own verification is unverifiable, so the token is the whole security model.
+Public API for sending and verifying one-time passwords. Authenticate every request with your API key as a Bearer token. The delivery channel is chosen by your account routing; you only pass the recipient. The code itself is never returned by the API.  Errors are always `{\"error\": {\"type\", \"message\", \"details\"?}}`.  Every send, resend and status response carries `completion`. `code` means the user enters a code and you call verify. Every non-WhatsApp channel and WhatsApp under the template mode deliver it directly; WhatsApp under code-back instead returns an `action_url` (a wa.me link) the user opens to send us a prefilled message, and we reply with the code. `inbound` means that prefilled message itself approves the OTP: there is no code, and you learn the outcome by polling `GET /otp/:id` or from the `otp.approved` webhook. Which WhatsApp mode applies is configured per account.  If your app uses one of the mobile SDKs, the device verifies against the client API and receives a `verification_token` instead of a result. Exchange that token here, with your server key (`POST /verifications/exchange`), to learn which recipient was verified. What an app tells your backend about its own verification is unverifiable, so the token is the whole security model.
 
 API version: 1.0.0
 */
@@ -35,6 +35,8 @@ func (r ApiGetOtpStatusRequest) Execute() (*OtpStatusResponse, *http.Response, e
 
 /*
 GetOtpStatus Fetch the current status of an OTP.
+
+status is one of pending, approved, failed, expired. Under completion "inbound" this is how you learn the approval without the webhook: poll it every 3 to 5 seconds until status leaves pending.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param otpId
@@ -184,6 +186,8 @@ func (r ApiResendOtpRequest) Execute() (*OtpResponse, *http.Response, error) {
 
 /*
 ResendOtp Resend a pending OTP, escalating the channel if configured.
+
+Moves the OTP to the next channel of your routing order, to the channel you name, or repeats the last one once the order is exhausted, and dispatches again; the response has the same shape as send. completion follows the channel: leaving WhatsApp for a code channel sets it back to "code"; landing on WhatsApp in a link mode returns an action_url, and an OTP already in a link mode gets the same link back.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiResendOtpRequest
@@ -365,7 +369,7 @@ func (r ApiSendOtpRequest) Execute() (*OtpResponse, *http.Response, error) {
 /*
 SendOtp Start an OTP: routes a channel and dispatches the code.
 
-Routing picks the channel from the app config. When it selects WhatsApp the code is not sent yet: the response returns action_url (a wa.me link) the user opens to receive the code over WhatsApp, and the OTP stays pending until they enter it. On all other channels the code is delivered directly and action_url is null. Either way the user enters the code and you call POST /otp/verify.
+Routing picks the channel from the app config. The response tells you how this OTP completes. completion "code": the code was delivered (SMS, email, Telegram, or WhatsApp under the template mode), the user enters it and you call POST /otp/verify. On WhatsApp in a link mode the code is not sent yet: action_url is a wa.me link the user opens to send us a prefilled message; under completion "code" we reply to that message with the code, under completion "inbound" the message itself approves the OTP, there is no code, and you learn the outcome by polling GET /otp/:id or from the otp.approved webhook. Which WhatsApp mode applies is configured per account. Sandbox OTPs always complete with "code": on WhatsApp they still return a sample action_url so you can see the shape, but nothing inbound happens; verify with the sandbox code. Outside sandbox, action_url is null whenever no link is involved.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiSendOtpRequest
@@ -520,6 +524,8 @@ func (r ApiVerifyOtpRequest) Execute() (*VerifyResponse, *http.Response, error) 
 
 /*
 VerifyOtp Verify a code against a pending OTP.
+
+matched is true only on the correct code. An OTP with completion "inbound" has no code: while it is pending a verify call never matches and spends an attempt (enough wrong calls fail it); once the inbound message has approved it, any verify call simply reports the approved OTP. Wait for the approval instead.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiVerifyOtpRequest
